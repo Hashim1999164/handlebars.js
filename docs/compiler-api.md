@@ -321,13 +321,13 @@ The `Handlebars.JavaScriptCompiler` object has a number of methods that may be c
 ### Example for the compiler api.
 
 This example makes context property lookups case-insensitive by lowercasing the
-name at compile time, so `{{Test}}` resolves `test`. This illustrates how
-compiler behavior can be changed.
+name at compile time, so `{{#each Test}}` / `{{Value}}` resolve `test` / `value`.
+This illustrates how compiler behavior can be changed.
 
 Note: calling a registered helper from `nameLookup` (for example via
 `helpers.lookupLowerCase`) is not reliable since Handlebars 4.6, because helper
-wrappers treat the last argument as options. Prefer generating
-`lookupProperty(...)` calls as shown below.
+wrappers treat the last argument as options. Lowercase the name, then delegate
+to the base `nameLookup` so the example keeps working as compiler internals change.
 
 ```javascript
 function MyCompiler() {
@@ -340,22 +340,14 @@ MyCompiler.prototype.compiler = MyCompiler;
 
 MyCompiler.prototype.nameLookup = function (parent, name, type) {
   if (type === 'context') {
-    this.lookupPropertyFunctionIsUsed = true;
-    return [
-      'lookupProperty(',
-      parent,
-      ',',
-      JSON.stringify(String(name).toLowerCase()),
-      ')',
-    ];
-  } else {
-    return Handlebars.JavaScriptCompiler.prototype.nameLookup.call(
-      this,
-      parent,
-      name,
-      type
-    );
+    name = String(name).toLowerCase();
   }
+  return Handlebars.JavaScriptCompiler.prototype.nameLookup.call(
+    this,
+    parent,
+    name,
+    type
+  );
 };
 
 var env = Handlebars.create();
