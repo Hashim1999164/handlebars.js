@@ -321,7 +321,7 @@ The `Handlebars.JavaScriptCompiler` object has a number of methods that may be c
 ### Example for the compiler api.
 
 This example makes context property lookups case-insensitive by lowercasing the
-name at compile time, so `{{#each Test}}` / `{{Value}}` resolve `test` / `value`.
+name at compile time, so `{{#each Test}}` / `{{Value}}` resolve to `test` / `value`.
 This illustrates how compiler behavior can be changed.
 
 Note: calling a registered helper from `nameLookup` (for example via
@@ -334,6 +334,7 @@ function MyCompiler() {
   Handlebars.JavaScriptCompiler.apply(this, arguments);
 }
 MyCompiler.prototype = Object.create(Handlebars.JavaScriptCompiler.prototype);
+MyCompiler.prototype.constructor = MyCompiler;
 
 // Use this compiler for nested BlockStatement blocks
 MyCompiler.prototype.compiler = MyCompiler;
